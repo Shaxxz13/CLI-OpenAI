@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"log"
+	"bufio"
 	"github.com/PullRequestInc/go-gpt3"
 	"github.com/joho/godotenv"
 )
@@ -19,18 +20,24 @@ func main() {
 
 	ctx := context.Background()
 	client := gpt3.NewClient(apiKey)
+
 	// Get the prompt from the user
 	fmt.Print("Enter a prompt: ")
-	var prompt string
-	fmt.Scanln(&prompt)
 
+	in := bufio.NewReader(os.Stdin)
+	prompt, err := in.ReadString('\n')
+
+	//Stop the CLI with exit input
 	if prompt == "exit" {
 		fmt.Println("EXIT")
 		os.Exit(1)
 	}
+
+	
+
 	resp, err := client.Completion(ctx, gpt3.CompletionRequest{
 		Prompt:    []string{prompt},
-		MaxTokens: gpt3.IntPtr(30),
+		MaxTokens: gpt3.IntPtr(10),
 		Stop:      []string{"."},
 		Echo:      true,
 	})

@@ -2,7 +2,11 @@ module chatgptv1
 
 go 1.18
 
-require golang.org/x/oauth2 v0.3.0
+require (
+	github.com/PullRequestInc/go-gpt3 v1.1.10
+	github.com/joho/godotenv v1.3.0
+	golang.org/x/oauth2 v0.3.0
+)
 
 require (
 	github.com/golang/protobuf v1.5.2 // indirect

@@ -1,66 +1,33 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
-	"golang.org/x/oauth2"
-)
-
-const (
-	baseURL = "https://api.openai.com/v1/"
+	"log"
+	"github.com/PullRequestInc/go-gpt3"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Set up the HTTP client with the access token
-	token := os.Getenv("CHATGPT_TOKEN")
-	if token == "" {
-		fmt.Fprintln(os.Stderr, "CHATGPT_TOKEN environment variable must be set")
-		os.Exit(1)
-	}
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-	tc := oauth2.NewClient(context.Background(), ts)
+	godotenv.Load()
 
-	// Set up the request to the ChatGPT API
-	prompt := "What's your favorite color?"
-	model := "text-davinci-002"
-	maxTokens := 50
-	temperature := 0.5
-	reqBody := map[string]interface{}{
-		"prompt":       prompt,
-		"model":        model,
-		"max_tokens":   maxTokens,
-		"temperature":  temperature,
-		"presence":     0.5,
-		"stop":         "",
-		"stream":       false,
-		"max_tokens":   50,
-		"temperature":  0.5,
-		"top_p":        1,
-		"frequency_penalty": 0,
-		"presence_penalty": 0,
+	apiKey := os.Getenv("CHATGPT_TOKEN")
+	if apiKey == "" {
+		log.Fatalln("Missing API KEY")
 	}
-	jsonBody, err := json.Marshal(reqBody)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error encoding JSON: %s", err)
-		os.Exit(1)
-	}
-	resp, err := tc.Post(baseURL+"chat", "application/json", bytes.NewBuffer(jsonBody))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error making request: %s", err)
-		os.Exit(1)
-	}
-	defer resp.Body.Close()
 
-	// Print the response
-	body, err := ioutil.ReadAll(resp.Body)
+	ctx := context.Background()
+	client := gpt3.NewClient(apiKey)
+
+	resp, err := client.Completion(ctx, gpt3.CompletionRequest{
+		Prompt:    []string{"The first thing you should know about javascript is"},
+		MaxTokens: gpt3.IntPtr(30),
+		Stop:      []string{"."},
+		Echo:      true,
+	})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading response: %s", err)
-		os.Exit(1)
+		log.Fatalln(err)
 	}
-	fmt.Println(string(body))
+	fmt.Println(resp.Choices[0].Text)
 }

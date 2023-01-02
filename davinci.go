@@ -33,8 +33,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	
-
+	// Invoking PR go-gpt3 module 
 	resp, err := client.Completion(ctx, gpt3.CompletionRequest{
 		Prompt:    []string{prompt},
 		MaxTokens: gpt3.IntPtr(10),
@@ -46,4 +45,5 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println(resp.Choices[0].Text)
+
 }

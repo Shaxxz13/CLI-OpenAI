@@ -5,3 +5,7 @@ To run this program, you'll need to set the CHATGPT_TOKEN environment variable t
 
 go build
 CHATGPT_TOKEN=your_api_key ./chatgpt
+
+# Exit the CLI
+
+Give Input = exit
